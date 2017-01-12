@@ -94,6 +94,7 @@ $(document).on('click', '#sendMessage', function(){
 });
 
 $(document).on('click', '#callButton', function(){
+    console.log('callButton');
     createOffer(); 
     return false;
 });

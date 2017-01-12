@@ -15,6 +15,7 @@ function gotStream(stream) {
   document.getElementById("callButton").style.display = 'inline-block';
   document.getElementById("localVideo").src = URL.createObjectURL(stream);
   
+  // для скриншота
   localMediaStream = stream;
     
   pc = new PeerConnection(null);
@@ -66,11 +67,12 @@ var socket = io.connect('localhost:1234');
 
 socket.on('room', function (message){
     //to do написать нормально
-    var access = confirm("Ответить?");
-    if (access === false) {
-        return;
-    }
+//    var access = confirm("Ответить?");
+//    if (access === false) {
+//        return;
+//    }
     
+    message = JSON.parse(message);
     if (message.type === 'offer') {
         pc.setRemoteDescription(new SessionDescription(message));
         createAnswer();
@@ -96,17 +98,13 @@ for (i = 1; i <= 10; i++) {
     room[i] = 'chatRoom_' + i;
 }
 
-//console.log(room);
-
-var roomData = JSON.stringify({id: id, room: room, message: 'message'});
-socket.emit('room', roomData);
+//var roomData = JSON.stringify({id: id, room: room, message: 'message'});
+//socket.emit('room', roomData);
     
 function sendMessage(message){
-    var roomData = JSON.stringify({id: 'admin', room: 'general', message: message});
+    var roomData = JSON.stringify({id: id, room: room, message: message});
     socket.emit('room', roomData);
 };
-
-//socket.emit('create or join', 'confirence'); 
 
 $(document).on('click', '#sendMessage', function(){
     socket.emit('chat message', $('#message').val());
@@ -117,11 +115,6 @@ $(document).on('click', '#callButton', function(){
     createOffer(); 
     return false;
 });
-
-//$('#callButton').on('click', function(){
-//    createOffer();
-//    return false;
-//});
 
 socket.on('chat message', function(msg){
     $('#messages').append($('<li>').text('Ответ: ' + msg));
