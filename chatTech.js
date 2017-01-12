@@ -24,6 +24,7 @@ function gotStream(stream) {
 };
 
 function createOffer() {
+
   pc.createOffer(
     gotLocalDescription, 
     function(error) { console.log(error) }, 
@@ -64,15 +65,29 @@ function gotRemoteStream(event){
 
 var socket = io.connect('localhost:1234');
 
-function sendMessage(message){
-  socket.emit('message', message);
+function generateName() {
+    var s4 = function() {
+        return Math.floor(Math.random() * 0x10000).toString(16);
+    };
+    return s4() + "-" + s4() + "-" + s4() + "-" + s4();  
 };
 
-socket.emit('speak_room', 'default');
+var id = 'Tech';//-' + generateName();
 
-socket.on('speak_room', function(room) {
-    console.log(room);
-});
+function sendMessage(message){
+//  socket.emit('message', message);
+    //раскоментить и убрать предыдущий emit
+    socket.emit('speak_room', message);
+};
+
+socket.emit('id', id);
+
+
+//socket.emit('speak_room', {id : id, rooms : rooms, message : message});
+//
+//socket.on('speak_room', function(room) {
+//    console.log(room);
+//});
 
 socket.on('message', function (message){
   if (message.type === 'offer') {
@@ -87,6 +102,21 @@ socket.on('message', function (message){
     pc.addIceCandidate(candidate);
   }
 });
+
+socket.on('speak_room', function (message){
+  if (message.type === 'offer') {
+    pc.setRemoteDescription(new SessionDescription(message));
+    createAnswer();
+  } 
+  else if (message.type === 'answer') {
+    pc.setRemoteDescription(new SessionDescription(message));
+  } 
+  else if (message.type === 'candidate') {
+    var candidate = new IceCandidate({sdpMLineIndex: message.label, candidate: message.candidate});
+    pc.addIceCandidate(candidate);
+  }
+});
+
 $(document).on('click', '#sendMessage', function(){
     socket.emit('chat message', $('#message').val());
     $('#message').text('');
@@ -103,9 +133,6 @@ socket.on('chat message', function(msg){
     console.log(msg);
 });
 
-
-
-
 // скриншот
 var video;
 var canvas = document.getElementsByTagName('canvas');
@@ -120,6 +147,6 @@ function snapshot() {
     video = document.getElementById('remoteVideo');
     ctx.drawImage(video, 0, 0);
     // "image/webp" для chrome, для ост. браузеров "image/png"
-    document.getElementsByTagName('img').src = canvas.toDataURL('image/png');
+    document.getElementsByTagName('img').src = canvas.toDataURL('image/webp');
   }
 }

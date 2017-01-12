@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style type="text/css">
+    html { height: 100%; }
+    body { height: 100%; margin: 0; text-align: center; }
+    #remoteVideo { height: 50%; margin-top: 5%; background: #000; }
+    #localVideo { width: 20%; position: absolute; right: 1.1em; bottom: 1em; border: 1px solid #333; background: #000; }
+/*    #callButton { position: absolute; display: none; left: 50%; font-size: 2em; bottom: 5%; border-radius: 1em; }*/
+    form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+    form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+    form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages li { padding: 5px 10px; width: 30%}
+    #messages li:nth-child(odd) { background: #eee; }
+  </style>
+<script src="jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="chatUser.js" ></script>
+</head>
+<video id="localVideo" autoplay muted></video>
+<video id="remoteVideo" autoplay></video>
+<button id="callButton">?</button>
+<ul id="messages"></ul>
+<form action="">
+  <input id="message" autocomplete="off" /><button id="sendMessage">Send</button>
+</form>
+</html>
