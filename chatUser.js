@@ -1,12 +1,18 @@
-var pc;     
-var localMediaStream = null;      
+var pc;        
 var PeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 var IceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 var SessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
 navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
 
 navigator.getUserMedia(
-  { audio: true, video: true }, 
+  {  video: {
+      mandatory: {
+      minWidth: 1280,
+      minHeight: 720,
+      minFrameRate: 30
+      }
+    },
+  audio: true }, 
   gotStream, 
   function(error) { console.log(error) }
 );
@@ -14,8 +20,6 @@ navigator.getUserMedia(
 function gotStream(stream) {
   document.getElementById("callButton").style.display = 'inline-block';
   document.getElementById("localVideo").src = URL.createObjectURL(stream);
-  
-  localMediaStream = stream;
     
   pc = new PeerConnection(null);
   pc.addStream(stream);
@@ -60,20 +64,30 @@ function gotRemoteStream(event){
   document.getElementById("remoteVideo").src = URL.createObjectURL(event.stream);
 };
 
-// Socket.io
-
-var socket = io.connect('localhost:1234');
-
 function generateName() {
     var s4 = function() {
         return Math.floor(Math.random() * 0x10000).toString(16);
     };
-    return s4() + "-" + s4() + "-" + s4() + "-" + s4();  
+    return s4() + "-" + s4();  
 };
 
-var id = 'User';//-' + generateName();
+var id = 'User-' + generateName();
+
+// Socket.io
+
+var socket = io.connect('localhost:1234');
 
 socket.emit('id', id);
+
+socket.on('wait', function(){
+    console.log('Not access Tech');
+});
+
+function sendMessage(message){
+//  socket.emit('message', message);
+    //раскоментить и убрать предыдущий emit
+    socket.emit('speak_room', message);
+};
 
 socket.on('speak_room', function (message){
   if (message.type === 'offer') {
@@ -87,6 +101,13 @@ socket.on('speak_room', function (message){
     var candidate = new IceCandidate({sdpMLineIndex: message.label, candidate: message.candidate});
     pc.addIceCandidate(candidate);
   }
+});
+
+socket.on('leave', function(user){
+    var msg = user + ' leave of room';
+    $('#messages').append($('<li>').text(msg));
+    console.log(msg);
+    $('#remoteVideo').attr('src', '');
 });
 
 $(document).on('click', '#sendMessage', function(){
@@ -103,4 +124,12 @@ $(document).on('click', '#callButton', function(){
 socket.on('chat message', function(msg){
     $('#messages').append($('<li>').text(msg));
     console.log(msg);
+});
+
+$(document).ready(function(){
+    $('#closeConnection').on('click', function(){
+        socket.emit('closeChat');
+        pc = null;
+        location.reload();
+    });
 });
