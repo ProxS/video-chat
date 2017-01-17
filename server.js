@@ -79,7 +79,7 @@ io.sockets.on('connection', function (socket) {
     //удалить message    
 	socket.on('message', function (message) {
 		console.log('Got message: ' + message);
-		socket.broadcast.emit('message', message);
+        socket.broadcast.to(socket.room).emit('speak_room', message);
 	});
 
 	socket.on('speak_room', function (videoFlow) {
@@ -94,7 +94,7 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('closeChat', function() {
-       socket.broadcast.to(socket.room).emit("leave", socket.user_id);     
+       socket.broadcast.to(socket.room).emit("closeChat", socket.user_id);     
     });
     
     socket.on("disconnect", function() {

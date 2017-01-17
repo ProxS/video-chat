@@ -163,7 +163,8 @@ socket.on('chat message', function(msg){
     console.log(msg);
 });
 
-socket.on('leave', function(user){
+socket.on('closeChat', function(user){
+    download();
     var msg = user + ' leave of room';
     $('#messages').append($('<li>').text(msg));
     console.log(msg);
@@ -215,7 +216,7 @@ function saveImage(dataImage){
 
 $(document).ready(function() {
     $('#screenshot').on('click', function(){
-        screenshot(600, 300);
+        screenshot(640, 480);
         return false; 
     });
     

@@ -61,7 +61,7 @@ function gotIceCandidate(event){
 };
 
 function gotRemoteStream(event){
-  document.getElementById("remoteVideo").src = URL.createObjectURL(event.stream);
+    document.getElementById("remoteVideo").src = URL.createObjectURL(event.stream);
 };
 
 function generateName() {
@@ -84,9 +84,7 @@ socket.on('wait', function(){
 });
 
 function sendMessage(message){
-//  socket.emit('message', message);
-    //раскоментить и убрать предыдущий emit
-    socket.emit('speak_room', message);
+    socket.emit('speak_room', message);    
 };
 
 socket.on('speak_room', function (message){
@@ -103,8 +101,8 @@ socket.on('speak_room', function (message){
   }
 });
 
-socket.on('leave', function(user){
-    var msg = user + ' leave of room';
+socket.on('closeChat', function(user_id){
+    var msg = user_id + ' leave of room';
     $('#messages').append($('<li>').text(msg));
     console.log(msg);
     $('#remoteVideo').attr('src', '');
