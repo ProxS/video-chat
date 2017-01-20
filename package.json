@@ -9,6 +9,7 @@
   "author": "ProxS",
   "license": "ISC",
   "dependencies": {
+    "log4js": "^1.1.0",
     "node-static": "^0.7.9",
     "socket.io": "^1.7.2"
   }
